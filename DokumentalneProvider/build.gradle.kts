@@ -1,6 +1,10 @@
 // use an integer for version numbers
 version = 1
 
+android {
+    namespace = "com.lagradost"
+}
+
 cloudstream {
     language = "pl"
     // All of these properties are optional, you can safely remove them
@@ -16,9 +20,10 @@ cloudstream {
      * 3: Beta only
      * */
     status = 1
-    tvTypes = listOf(
-        "Documentary"
-    )
+    tvTypes =
+        listOf(
+            "Documentary",
+        )
 
     iconUrl = "https://www.google.com/s2/favicons?domain=dokumentalne.net&sz=%size%"
 }

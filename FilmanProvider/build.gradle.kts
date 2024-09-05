@@ -1,6 +1,9 @@
 // use an integer for version numbers
 version = 2
 
+android {
+    namespace = "com.lagradost"
+}
 
 cloudstream {
     language = "pl"

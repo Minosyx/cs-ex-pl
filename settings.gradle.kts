@@ -4,36 +4,12 @@ rootProject.name = "CloudstreamPlugins"
 // to the includes below.
 
 // Plugins are included like this
-val disabled = listOf<String>(
-    "EgyBestProvider",
-    "FaselHDProvider",
-    "AkwamProvider",
-    "MyCimaProvider", 
-    "AnimeIndoProvider", 
-    "AnimeSailProvider", 
-    "Anizm", 
-    "DramaidProvider", 
-    "DubokuProvider", 
-    "Gomunimeis", 
-    "GomunimeProvider", 
-    "Hdfilmcehennemi", 
-    "HDrezkaProvider", 
-    "IdlixProvider", 
-    "KuramanimeProvider", 
-    "KuronimeProvider", 
-    "LayarKacaProvider", 
-    "MultiplexProvider", 
-    "NeonimeProvider", 
-    "NontonAnimeIDProvider", 
-    "OploverzProvider", 
-    "OtakudesuProvider", 
-    "PhimmoichillProvider", 
-    "RebahinProvider", 
-    "TocanimeProvider", 
-    "UakinoProvider", 
-    "UseeTv", 
-    "YomoviesProvider"
-)
+val disabled =
+    listOf<String>(
+        "DokumentalneProvider",
+        "TvpolanProvider",
+        "VizjerProvider",
+    )
 
 File(rootDir, ".").eachDir { dir ->
     if (!disabled.contains(dir.name) && File(dir, "build.gradle.kts").exists()) {
@@ -44,7 +20,6 @@ File(rootDir, ".").eachDir { dir ->
 fun File.eachDir(block: (File) -> Unit) {
     listFiles()?.filter { it.isDirectory }?.forEach { block(it) }
 }
-
 
 // To only include a single project, comment out the previous lines (except the first one), and include your plugin like so:
 // include("PluginName")

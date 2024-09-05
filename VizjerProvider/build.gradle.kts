@@ -1,6 +1,9 @@
 // use an integer for version numbers
 version = 4
 
+android {
+    namespace = "com.lagradost"
+}
 
 cloudstream {
     language = "pl"
@@ -17,10 +20,11 @@ cloudstream {
      * 3: Beta only
      * */
     status = 1
-    tvTypes = listOf(
-        "Movie",
-        "TvSeries"
-    )
+    tvTypes =
+        listOf(
+            "Movie",
+            "TvSeries",
+        )
 
     iconUrl = "https://www.google.com/s2/favicons?domain=vizjer.pl&sz=%size%"
 }

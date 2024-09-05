@@ -1,5 +1,5 @@
-import com.lagradost.cloudstream3.gradle.CloudstreamExtension
 import com.android.build.gradle.BaseExtension
+import com.lagradost.cloudstream3.gradle.CloudstreamExtension
 
 buildscript {
     repositories {
@@ -10,10 +10,10 @@ buildscript {
     }
 
     dependencies {
-        classpath("com.android.tools.build:gradle:7.0.4")
+        classpath("com.android.tools.build:gradle:7.4.2")
         // Cloudstream gradle plugin which makes everything work and builds plugins
         classpath("com.github.recloudstream:gradle:-SNAPSHOT")
-        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.20")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:2.0.20")
     }
 }
 
@@ -28,8 +28,7 @@ allprojects {
 fun Project.cloudstream(configuration: CloudstreamExtension.() -> Unit) =
     extensions.getByName<CloudstreamExtension>("cloudstream").configuration()
 
-fun Project.android(configuration: BaseExtension.() -> Unit) =
-    extensions.getByName<BaseExtension>("android").configuration()
+fun Project.android(configuration: BaseExtension.() -> Unit) = extensions.getByName<BaseExtension>("android").configuration()
 
 subprojects {
     apply(plugin = "com.android.library")
@@ -38,15 +37,15 @@ subprojects {
 
     cloudstream {
         // when running through github workflow, GITHUB_REPOSITORY should contain current repository name
-        setRepo(System.getenv("GITHUB_REPOSITORY") ?: "user/repo")
+        setRepo(System.getenv("GITHUB_REPOSITORY") ?: "Minosyx/cloudstream-extensions-polish")
     }
 
     android {
-        compileSdkVersion(30)
+        compileSdkVersion(33)
 
         defaultConfig {
-            minSdk = 21
-            targetSdk = 30
+            minSdk = 26
+            targetSdk = 33
         }
 
         compileOptions {
@@ -59,9 +58,9 @@ subprojects {
                 jvmTarget = "1.8" // Required
                 // Disables some unnecessary features
                 freeCompilerArgs = freeCompilerArgs +
-                        "-Xno-call-assertions" +
-                        "-Xno-param-assertions" +
-                        "-Xno-receiver-assertions"
+                    "-Xno-call-assertions" +
+                    "-Xno-param-assertions" +
+                    "-Xno-receiver-assertions"
             }
         }
     }
@@ -77,18 +76,19 @@ subprojects {
         // but you dont need to include any of them if you dont need them
         // https://github.com/recloudstream/cloudstream/blob/master/app/build.gradle
         implementation(kotlin("stdlib")) // adds standard kotlin features, like listOf, mapOf etc
-        implementation("com.github.Blatzar:NiceHttp:0.3.2") // http library
+        implementation("com.github.Blatzar:NiceHttp:0.4.11") // http library
         implementation("com.fasterxml.jackson.module:jackson-module-kotlin:2.13.1")
-        implementation("org.jsoup:jsoup:1.13.1") // html parser
+        implementation("org.jsoup:jsoup:1.17.2") // html parser
+        implementation("com.github.LagradOst:SafeFile:0.0.6")
         implementation("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4") // html parser
 
-        //run JS
-        implementation("org.mozilla:rhino:1.7.14")
-		    // Library/extensions searching with Levenshtein distance
-        implementation ("me.xdrop:fuzzywuzzy:1.4.0")
+        // run JS
+        implementation("org.mozilla:rhino:1.7.15")
+        // Library/extensions searching with Levenshtein distance
+        implementation("me.xdrop:fuzzywuzzy:1.4.0")
     }
 }
 
 task<Delete>("clean") {
-    delete(rootProject.buildDir)
+    delete(layout.buildDirectory.get())
 }
