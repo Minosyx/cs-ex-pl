@@ -55,14 +55,27 @@ class EkinoProvider : MainAPI() {
                     val href = mainUrl + leftScope.select("a").attr("href")
                     val poster = imagePrefix + leftScope.select("img[src]").attr("src").replace("/thumb/", "/normal/")
                     val year = rightScope.select(".cates").text().takeUnless { it.isBlank() }?.toIntOrNull()
-                    MovieSearchResponse(
-                        name, 
-                        href, 
-                        this.name, 
-                        if (isSeries) TvType.TvSeries else TvType.Movie,
-                        poster, 
-                        year, 
-                    )
+                    
+                    if (isSeries) {
+                        TvSeriesSearchResponse(
+                            name,
+                            href,
+                            this.name,
+                            TvType.TvSeries,
+                            poster,
+                            year,
+                            null,
+                        )
+                    } else {
+                        MovieSearchResponse(
+                            name, 
+                            href, 
+                            this.name, 
+                            TvType.Movie,
+                            poster, 
+                            year, 
+                        )
+                    }
                     // there might be needed an option for series
                 }   
 
@@ -93,6 +106,7 @@ class EkinoProvider : MainAPI() {
                     img = mainUrl + img
                     img = img.replace("/thumb/", "/normal/")
                 }
+                val year = i.select(".cates").text().takeUnless { it.isBlank() }?.toIntOrNull()
                 if (type === TvType.TvSeries) {
                     TvSeriesSearchResponse(
                         name,
@@ -100,6 +114,7 @@ class EkinoProvider : MainAPI() {
                         this.name,
                         type,
                         img,
+                        year,
                         null,
                     )
                 } else {
@@ -109,7 +124,7 @@ class EkinoProvider : MainAPI() {
                         this.name,
                         type,
                         img,
-                        null,
+                        year,
                     )
                 }
             }
@@ -130,10 +145,13 @@ class EkinoProvider : MainAPI() {
         val title = document.select("h1.title").text()
         val data = document.select(".playerContainer").outerHtml()
         val posterUrl = mainUrl + document.select(".moviePoster").attr("src")
-        val plot = document.select(".description").text()
+        val year = 
+            document
+                .select(".catBox .cat .a").text().toIntOrNull()
+        val plot = document.select(".descriptionMovie").text()
         val episodesElements = document.select(".list-series > a[href]")
         if (episodesElements.isEmpty()) {
-            return MovieLoadResponse(title, url, name, TvType.Movie, data, posterUrl, null, plot)
+            return MovieLoadResponse(title, url, name, TvType.Movie, data, posterUrl, year, plot)
         }
         val episodes = episodesElements
             .mapNotNull { episode ->
@@ -155,8 +173,40 @@ class EkinoProvider : MainAPI() {
             TvType.TvSeries,
             episodes,
             posterUrl,
-            null,
+            year,
             plot,
         )
     }
+
+    override suspend fun loadLinks(
+        data: String,
+        isCasting: Boolean,
+        subtitleCallback: (SubtitleFile) -> Unit,
+        callback: (ExtractorLink) -> Unit,
+    ): Boolean {
+        val document =
+            if (data.startsWith("http")) {
+                app
+                    .get(data)
+                    .document
+                    .select(".playerContainer .tab-content")
+                    .first()
+            } else {
+                Jsoup.parse(data)
+            }
+        
+        // val namesMap = document.select(".players a").map { 
+        //     i -> i.text() to i.attr("href")
+        // }
+
+        document?.select(".players a")?.apmap { item ->
+            val link = document.select(".playerContainer .tab-content > div#" + item.attr("href") + " a.buttonprch").attr("href")
+            loadExtractor(link, subtitleCallback, callback)
+        }
+        return true
+    }
 }
+
+data class LinkElement(
+    @JsonProperty("src") val src: String,
+)
