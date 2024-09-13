@@ -156,13 +156,13 @@ class EkinoProvider : MainAPI() {
         val episodes = episodesElements
             .mapNotNull { episode ->
                 val e = episode.text()
-                val regex = Regex("""\[\d+\]""").findAll(episode.attr("href"))
-                val s_e_list = regex.map { it.groupValues[1] }.toList()
+                val regex = Regex("""\[(\d+)\]""").findAll(episode.attr("href"))
+                val s_e_list = regex.map { it.groups[1]?.value }.toList()
                 Episode(
                     mainUrl + episode.attr("href"),
                     e.trim(),
-                    s_e_list[0].toInt(),
-                    s_e_list[1].toInt(),
+                    s_e_list[0]?.toInt(),
+                    s_e_list[1]?.toInt(),
                 )
             }.toMutableList()
 
