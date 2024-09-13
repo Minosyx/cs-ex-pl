@@ -45,7 +45,7 @@ class EkinoProvider : MainAPI() {
                     .trim(),
             )
             if (subtitle != null) title += " $subtitle"
-            
+            var isSeries = title.contains("serial")
             val items =
                 l.select("li").map { i -> 
                     val leftScope = i.select(".scope_left")
@@ -53,16 +53,17 @@ class EkinoProvider : MainAPI() {
 
                     val name = rightScope.select(".title > a").text()
                     val href = mainUrl + leftScope.select("a").attr("href")
-                    val poster = imagePrefix + leftScope.select("img[src]").attr("src")
+                    val poster = imagePrefix + leftScope.select("img[src]").attr("src").replace("/thumb/", "/normal/")
                     val year = rightScope.select(".cates").text().takeUnless { it.isBlank() }?.toIntOrNull()
                     MovieSearchResponse(
                         name, 
                         href, 
                         this.name, 
-                        TvType.Movie, 
+                        if (isSeries) TvType.TvSeries else TvType.Movie,
                         poster, 
                         year, 
                     )
+                    // there might be needed an option for series
                 }   
 
             categories.add(HomePageList(title, items))
@@ -88,7 +89,7 @@ class EkinoProvider : MainAPI() {
                 var img = i.selectFirst("a > img[src]")?.attr("src")
                 val name = i.selectFirst(".title > a")?.text() ?: return@mapNotNull null
                 if (href.isNotEmpty()) href = mainUrl + href 
-                if (img != null) img = mainUrl + img
+                if (img != null) img = mainUrl + img!.replace("/thumb/", "/normal/")
                 if (type === TvType.TvSeries) {
                     TvSeriesSearchResponse(
                         name,
@@ -111,5 +112,48 @@ class EkinoProvider : MainAPI() {
             }
         }
         return getVideos(TvType.Movie, movies) + getVideos(TvType.TvSeries, series)
+    }
+
+    override suspend fun load(url: String): LoadResponse {
+        val document = app.get(url).document
+        val documentTitle = document.select("title").text().trim()
+
+        if (documentTitle.startsWith("Logowanie")) {
+            throw RuntimeException(
+                "This page seems to be locked behind a login-wall on the website, unable to scrape it. If it is not please report it.",
+            )
+        }
+
+        val title = document.select("h1.title").text()
+        val data = document.select(".playerContainer").outerHtml()
+        val posterUrl = mainUrl + document.select(".moviePoster").attr("src")
+        val plot = document.select(".description").text()
+        val episodesElements = document.select(".list-series > a[href]")
+        if (episodesElements.isEmpty()) {
+            return MovieLoadResponse(title, url, name, TvType.Movie, data, posterUrl, null, plot)
+        }
+        val episodes = episodesElements
+            .mapNotNull { episode ->
+                val e = episode.text()
+                val regex = Regex("""\[\d+\]""").findAll(e)
+                val s_e_list = regex.map { it.value }.toList()
+                Episode(
+                    mainUrl + episode.attr("href"),
+                    e.trim(),
+                    s_e_list[0].toInt(),
+                    s_e_list[1].toInt(),
+                )
+            }.toMutableList()
+
+        return TvSeriesLoadResponse(
+            title,
+            url,
+            name,
+            TvType.TvSeries,
+            episodes,
+            posterUrl,
+            null,
+            plot,
+        )
     }
 }
