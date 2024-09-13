@@ -1,0 +1,8 @@
+{
+  "name": "Minosyx-pl-provider",
+  "description": "Fork of Polish providers",
+  "manifestVersion": 1,
+  "pluginLists": [
+    "https://raw.githubusercontent.com/Minosyx/cs-ex-pl/builds/plugins.json"
+  ]
+}
