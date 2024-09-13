@@ -157,7 +157,7 @@ class EkinoProvider : MainAPI() {
             .mapNotNull { episode ->
                 val e = episode.text()
                 val regex = Regex("""\[\d+\]""").findAll(e)
-                val s_e_list = regex.map { it.value }.toList()
+                val s_e_list = regex.map { it.groupValues[1] }.toList()
                 Episode(
                     mainUrl + episode.attr("href"),
                     e.trim(),
