@@ -88,7 +88,7 @@ class EkinoProvider : MainAPI() {
                 var img = i.selectFirst("a > img[src]")?.attr("src")
                 val name = i.selectFirst(".title > a")?.text() ?: return@mapNotNull null
                 if (href.isNotEmpty()) href = mainUrl + href 
-                if (img != null) img = imagePrefix + img
+                if (img != null) img = mainUrl + img
                 if (type === TvType.TvSeries) {
                     TvSeriesSearchResponse(
                         name,
