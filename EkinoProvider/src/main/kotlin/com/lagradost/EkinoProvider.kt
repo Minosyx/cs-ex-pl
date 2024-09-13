@@ -19,6 +19,7 @@ class EkinoProvider : MainAPI() {
             TvType.TvSeries,
             TvType.Movie,
         )
+    val imagePrefix = "https:"
 
     override suspend fun getMainPage(
         page: Int,
@@ -28,7 +29,7 @@ class EkinoProvider : MainAPI() {
         val lists = document.select(".mostPopular")
         val categories = ArrayList<HomePageList>()
         for (l in lists) {
-            val title =
+            var title =
                 capitalizeString(
                     l
                         .select("h4")
@@ -36,14 +37,23 @@ class EkinoProvider : MainAPI() {
                         .lowercase()
                         .trim(),
                 )
+            val subtitle = capitalizeStringNullable(
+                l
+                    .select(".sm")
+                    .text()
+                    .lowercase()
+                    .trim(),
+            )
+            if (subtitle != null) title += " $subtitle"
+            
             val items =
                 l.select("li").map { i -> 
                     val leftScope = i.select(".scope_left")
                     val rightScope = i.select(".scope_right")
 
                     val name = rightScope.select(".title > a").text()
-                    val href = leftScope.select("a").attr("href")
-                    val poster = "https:" + leftScope.select("img[src]").attr("src")
+                    val href = mainUrl + leftScope.select("a").attr("href")
+                    val poster = imagePrefix + leftScope.select("img[src]").attr("src")
                     val year = rightScope.select(".cates").text().takeUnless { it.isBlank() }?.toIntOrNull()
                     MovieSearchResponse(
                         name, 
@@ -61,6 +71,44 @@ class EkinoProvider : MainAPI() {
     }
 
     override suspend fun search(query: String): List<SearchResponse> {
-        return ArrayList();
+        val url = "$mainUrl/search/qf/?q=$query"
+        val document = app.get(url).document
+        val lists = document.select(".movie-wrap > :not(div.menu-wrap)")
+        val movies = lists[0].select(".movies-list-item")
+        val series = lists[1].select(".movies-list-item")
+
+        if (movies.isEmpty() && series.isEmpty()) return ArrayList()
+
+        fun getVideos(
+            type: TvType,
+            items: Elements,
+        ): List<SearchResponse> {
+            return items.mapNotNull { i ->
+                var href = i.selectFirst("a")?.attr("href") ?: return@mapNotNull null
+                var img = i.selectFirst("a > img[src]")?.attr("src")
+                val name = i.selectFirst(".title > a")?.text() ?: return@mapNotNull null
+                if (href.isNotEmpty()) href = mainUrl + href 
+                if (img != null) img = imagePrefix + img
+                if (type === TvType.TvSeries) {
+                    TvSeriesSearchResponse(
+                        name,
+                        href,
+                        this.name,
+                        type,
+                        img,
+                        null,
+                    )
+                } else {
+                    MovieSearchResponse(
+                        name,
+                        href,
+                        this.name,
+                        type,
+                        img,
+                        null,
+                    )
+                }
+            }
+        }
+        return getVideos(TvType.Movie, movies) + getVideos(TvType.TvSeries, series)
     }
-}
