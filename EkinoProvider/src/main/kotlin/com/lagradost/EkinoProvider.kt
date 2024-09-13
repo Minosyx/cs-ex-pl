@@ -45,7 +45,7 @@ class EkinoProvider : MainAPI() {
                     .trim(),
             )
             if (subtitle != null) title += " $subtitle"
-            var isSeries = title.contains("serial")
+            var isSeries = title.contains("serial", ignoreCase = true)
             val items =
                 l.select("li").map { i -> 
                     val leftScope = i.select(".scope_left")
@@ -200,8 +200,9 @@ class EkinoProvider : MainAPI() {
         // }
 
         document?.select(".players a")?.apmap { item ->
-            val link = document.select(".playerContainer .tab-content > div#" + item.attr("href") + " a.buttonprch").attr("href")
-            loadExtractor(link, subtitleCallback, callback)
+            // val anchor = document.select(".playerContainer .tab-content > div#" + item.attr("href"))
+            // anchor.ajsoup
+            // loadExtractor(link, subtitleCallback, callback)
         }
         return true
     }
