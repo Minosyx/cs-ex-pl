@@ -20,7 +20,7 @@ class EkinoProvider : MainAPI() {
             TvType.Movie,
         )
     val imagePrefix = "https:"
-    val videoPrefix = "$mainUrl/watch/f/"
+    val videoPrefix = "$mainUrl/watch/f"
 
     override suspend fun getMainPage(
         page: Int,
@@ -195,17 +195,14 @@ class EkinoProvider : MainAPI() {
             } else {
                 Jsoup.parse(data)
             }
-        
-        // val namesMap = document.select(".players a").map { 
-        //     i -> i.text() to i.attr("href")
-        // }
 
         document?.select(".playerContainer .tab-content div[role]")?.apmap { item ->
-            val id = item.attr("id")
+            val id = item.id()
             val player = id.substringAfterLast("-")
             val code = id.substringBeforeLast("-")
             val frame_document = app.get("$videoPrefix/$player/$code").document
-            val link = frame_document.select("a.buttonprch").attr("href")
+            var link = frame_document.select("a.buttonprch").attr("href")
+            link = link.replace(Regex("""/[a-z]/"""), "/e/")
             loadExtractor(link, subtitleCallback, callback)
         }
         return true
