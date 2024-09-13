@@ -149,7 +149,7 @@ class EkinoProvider : MainAPI() {
             document
                 .select(".catBox .cat .a").text().toIntOrNull()
         val plot = document.select(".descriptionMovie").text()
-        val episodesElements = document.select(".list-series > a[href]")
+        val episodesElements = document.select(".list-series a[href]")
         if (episodesElements.isEmpty()) {
             return MovieLoadResponse(title, url, name, TvType.Movie, data, posterUrl, year, plot)
         }
