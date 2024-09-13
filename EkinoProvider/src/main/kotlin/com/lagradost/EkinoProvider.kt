@@ -20,6 +20,7 @@ class EkinoProvider : MainAPI() {
             TvType.Movie,
         )
     val imagePrefix = "https:"
+    val videoPrefix = "$mainUrl/watch/f/"
 
     override suspend fun getMainPage(
         page: Int,
@@ -199,10 +200,13 @@ class EkinoProvider : MainAPI() {
         //     i -> i.text() to i.attr("href")
         // }
 
-        document?.select(".players a")?.apmap { item ->
-            // val anchor = document.select(".playerContainer .tab-content > div#" + item.attr("href"))
-            // anchor.ajsoup
-            // loadExtractor(link, subtitleCallback, callback)
+        document?.select(".playerContainer .tab-content div[role]")?.apmap { item ->
+            val id = item.attr("id")
+            val player = id.substringAfterLast("-")
+            val code = id.substringBeforeLast("-")
+            val frame_document = app.get("$videoPrefix/$player/$code").document
+            val link = frame_document.select("a.buttonprch").attr("href")
+            loadExtractor(link, subtitleCallback, callback)
         }
         return true
     }
