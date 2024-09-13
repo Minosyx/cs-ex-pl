@@ -112,3 +112,4 @@ class EkinoProvider : MainAPI() {
         }
         return getVideos(TvType.Movie, movies) + getVideos(TvType.TvSeries, series)
     }
+}
