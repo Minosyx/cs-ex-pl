@@ -41,9 +41,9 @@ class EkinoProvider : MainAPI() {
                     val leftScope = i.select(".scope_left")
                     val rightScope = i.select(".scope_right")
 
-                    val name = rightScope.select(".title a").text()
+                    val name = rightScope.select(".title > a").text()
                     val href = leftScope.select("a").attr("href")
-                    val poster = leftScope.select("img[src]").attr("src")
+                    val poster = "https:" + leftScope.select("img[src]").attr("src")
                     val year = rightScope.select(".cates").text().takeUnless { it.isBlank() }?.toIntOrNull()
                     MovieSearchResponse(
                         name, 
