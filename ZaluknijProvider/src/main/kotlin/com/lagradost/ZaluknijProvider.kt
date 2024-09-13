@@ -5,6 +5,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
+import com.lagradost.cloudstream3.network.CloudflareKiller
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 
@@ -25,11 +26,13 @@ open class ZaluknijProvider : MainAPI() {
             TvType.Movie,
         )
 
+    private val interceptor = CloudflareKiller()
+
     override suspend fun getMainPage(
         page: Int,
         request: MainPageRequest,
     ): HomePageResponse {
-        val document = app.get(mainUrl).document
+        val document = app.get(mainUrl, interceptor = interceptor).document
         val lists = document.select(".item-list")
         val categories = ArrayList<HomePageList>()
         for (l in lists) {
@@ -65,7 +68,7 @@ open class ZaluknijProvider : MainAPI() {
 
     override suspend fun search(query: String): List<SearchResponse> {
         val url = "$mainUrl/wyszukiwarka?phrase=$query"
-        val document = app.get(url).document
+        val document = app.get(url, interceptor = interceptor).document
         val lists = document.select("#advanced-search > div")
         val movies = lists[1].select("div:not(.clearfix)")
         val series = lists[3].select("div:not(.clearfix)")
@@ -99,7 +102,7 @@ open class ZaluknijProvider : MainAPI() {
     }
 
     override suspend fun load(url: String): LoadResponse {
-        val document = app.get(url).document
+        val document = app.get(url, interceptor = interceptor).document
         val documentTitle = document.select("title").text().trim()
 
         if (documentTitle.startsWith("Logowanie")) {
