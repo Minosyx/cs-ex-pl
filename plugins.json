@@ -1,0 +1,59 @@
+[
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=ekino-tv.pl",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Minosyx/cs-ex-pl",
+        "fileSize": 12804,
+        "status": 1,
+        "language": "pl",
+        "authors": [
+            "Cloudburst"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 1,
+        "internalName": "EkinoProvider",
+        "url": "https://raw.githubusercontent.com/Minosyx/cs-ex-pl/builds/EkinoProvider.cs3",
+        "name": "EkinoProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=filman.cc&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Minosyx/cs-ex-pl",
+        "fileSize": 12884,
+        "status": 1,
+        "language": "pl",
+        "authors": [
+            
+        ],
+        "tvTypes": [
+            "TvSeries",
+            "Movie"
+        ],
+        "version": 2,
+        "internalName": "FilmanProvider",
+        "url": "https://raw.githubusercontent.com/Minosyx/cs-ex-pl/builds/FilmanProvider.cs3",
+        "name": "FilmanProvider"
+    },
+    {
+        "iconUrl": "https://www.google.com/s2/favicons?domain=zaluknij.xyz&sz=%size%",
+        "apiVersion": 1,
+        "repositoryUrl": "https://github.com/Minosyx/cs-ex-pl",
+        "fileSize": 12367,
+        "status": 1,
+        "language": "pl",
+        "authors": [
+            "Cloudburst"
+        ],
+        "tvTypes": [
+            "Movie",
+            "TvSeries"
+        ],
+        "version": 2,
+        "internalName": "ZaluknijProvider",
+        "url": "https://raw.githubusercontent.com/Minosyx/cs-ex-pl/builds/ZaluknijProvider.cs3",
+        "name": "ZaluknijProvider"
+    }
+]
