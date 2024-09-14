@@ -204,7 +204,7 @@ class EkinoProvider : MainAPI() {
             val code = id.substringBeforeLast("-")
             val frame_document = app.get("$videoPrefix/$player/$code", interceptor = interceptor, timeout = 30).document
             var link = frame_document.select("a.buttonprch").attr("href")
-            // link = link.replace(Regex("""/[a-z]/"""), "/e/")
+            link = link.replace(Regex("""/[a-z]/"""), "/e/")
             loadExtractor(link, subtitleCallback, callback)
         }
         return true
