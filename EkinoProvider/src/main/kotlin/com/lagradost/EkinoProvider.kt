@@ -5,6 +5,7 @@ import com.lagradost.cloudstream3.*
 import com.lagradost.cloudstream3.utils.AppUtils.tryParseJson
 import com.lagradost.cloudstream3.utils.ExtractorLink
 import com.lagradost.cloudstream3.utils.loadExtractor
+import com.lagradost.cloudstream3.network.CloudflareKiller
 import org.jsoup.Jsoup
 import org.jsoup.select.Elements
 
@@ -19,8 +20,10 @@ class EkinoProvider : MainAPI() {
             TvType.TvSeries,
             TvType.Movie,
         )
-    val imagePrefix = "https:"
-    val videoPrefix = "$mainUrl/watch/f"
+
+    private val imagePrefix = "https:"
+    private val videoPrefix = "$mainUrl/watch/f"
+    private val interceptor = CloudflareKiller()
 
     override suspend fun getMainPage(
         page: Int,
@@ -200,7 +203,7 @@ class EkinoProvider : MainAPI() {
             val id = item.id()
             val player = id.substringAfterLast("-")
             val code = id.substringBeforeLast("-")
-            val frame_document = app.get("$videoPrefix/$player/$code").document
+            val frame_document = app.get("$videoPrefix/$player/$code", interceptor = interceptor).document
             var link = frame_document.select("a.buttonprch").attr("href")
             link = link.replace(Regex("""/[a-z]/"""), "/e/")
             loadExtractor(link, subtitleCallback, callback)
