@@ -29,7 +29,7 @@ class EkinoProvider : MainAPI() {
         page: Int,
         request: MainPageRequest,
     ): HomePageResponse {
-        val document = app.get(mainUrl).document
+        val document = app.get(mainUrl, interceptor = interceptor, timeout = 30).document
         val lists = document.select(".mostPopular")
         val categories = ArrayList<HomePageList>()
         for (l in lists) {
@@ -80,7 +80,6 @@ class EkinoProvider : MainAPI() {
                             year, 
                         )
                     }
-                    // there might be needed an option for series
                 }   
 
             categories.add(HomePageList(title, items))
@@ -90,7 +89,7 @@ class EkinoProvider : MainAPI() {
 
     override suspend fun search(query: String): List<SearchResponse> {
         val url = "$mainUrl/search/qf/?q=$query"
-        val document = app.get(url).document
+        val document = app.get(url, interceptor = interceptor, timeout = 30).document
         val lists = document.select(".movie-wrap > :not(div.menu-wrap)")
         val movies = lists[0].select(".movies-list-item")
         val series = lists[1].select(".movies-list-item")
@@ -137,7 +136,7 @@ class EkinoProvider : MainAPI() {
     }
 
     override suspend fun load(url: String): LoadResponse {
-        val document = app.get(url).document
+        val document = app.get(url, interceptor = interceptor, timeout = 30).document
         val documentTitle = document.select("title").text().trim()
 
         if (documentTitle.startsWith("Logowanie")) {
@@ -191,7 +190,7 @@ class EkinoProvider : MainAPI() {
         val document =
             if (data.startsWith("http")) {
                 app
-                    .get(data)
+                    .get(data, interceptor = interceptor, timeout = 30)
                     .document
                     .select(".playerContainer .tab-content")
                     .first()
@@ -203,9 +202,9 @@ class EkinoProvider : MainAPI() {
             val id = item.id()
             val player = id.substringAfterLast("-")
             val code = id.substringBeforeLast("-")
-            val frame_document = app.get("$videoPrefix/$player/$code", interceptor = interceptor).document
+            val frame_document = app.get("$videoPrefix/$player/$code", interceptor = interceptor, timeout = 30).document
             var link = frame_document.select("a.buttonprch").attr("href")
-            link = link.replace(Regex("""/[a-z]/"""), "/e/")
+            // link = link.replace(Regex("""/[a-z]/"""), "/e/")
             loadExtractor(link, subtitleCallback, callback)
         }
         return true
